@@ -1,5 +1,9 @@
 # Google History analyzer
 
+## Known Shortcomings
+
+  * websites where "consuming" might be opening a tab and listening / watching content will have durations only until another browsing action is performed
+    * e.g. 30 video watched on `youtube.com`, but navigated to `foo.com` 5 minutes in, duration for domain `youtube.com` will be only 5 minutes for that interaction
 
 ## Instructions
 
