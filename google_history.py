@@ -5,7 +5,7 @@ Script to analyze browsing history from Google Takeout: https://takeout.google.c
 import argparse
 import json
 import logging
-import time
+import random
 from urllib.parse import urlparse
 import uuid
 
@@ -211,6 +211,27 @@ class GoogleHistoryAnalyzer:
             self.export_df(df, export)
         else:
             return df
+
+    def time_by_random_domain(
+        self,
+        export=None,
+    ):
+
+        """
+        Method to analyze by time spent on domains
+
+        :param groupby: str, "domain" or "subdomain"
+        :param include_month: boolean, if True include month/year in groupby cols
+        :param date_start: datetime, lower bound on date
+        :param date_end: datetime, upper bound on date
+        """
+
+        # get random domain from full data
+        domains = self.df.domain.unique()
+        random_domain = domains[random.randint(0, (len(domains) - 1))]
+
+        # execute time_by_domain()
+        return self.time_by_domain(domains=[random_domain], groupby="subdomain", include_month=True, export=export)
 
     def export_df(self, df, export_format):
 

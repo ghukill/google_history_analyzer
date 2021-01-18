@@ -1,0 +1,1 @@
+venv/bin/pyinstaller google_history.py --onefile --noconfirm --clean --hidden-import cmath --hidden-import tabulate --exclude-module PIL --exclude-module IPython --exclude PyInstaller
