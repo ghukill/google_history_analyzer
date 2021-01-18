@@ -2,11 +2,13 @@
 Script to analyze browsing history from Google Takeout: https://takeout.google.com/settings/takeout
 """
 
+import argparse
 import io
 import json
 import logging
 import os
 from urllib.parse import urlparse
+import uuid
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -53,6 +55,8 @@ class GoogleHistoryAnalyzer:
         Extract, synthesize, and normalize columns for analysis
         """
 
+        logging.info("pre-processing data for analysis")
+
         # create datetime column
         self.df["timestamp"] = pd.to_datetime(self.df["time_usec"], unit="us")
 
@@ -76,7 +80,6 @@ class GoogleHistoryAnalyzer:
         self.df["time_spent_s"] = -(self.df.timestamp.diff() / np.timedelta64(1, "s"))
 
         # upperbound seconds at 600 (10 minutes) [default] on a single page
-        # QUESTION: consider moving to method for more control
         self.df.time_spent_s = self.df.time_spent_s.clip(upper=self.single_page_time_spent_limit)
 
         # derive from seconds
@@ -127,7 +130,14 @@ class GoogleHistoryAnalyzer:
         return df
 
     def time_by_domain(
-        self, domains=None, subdomains=None, groupby="domain", include_month=False, date_start=None, date_end=None
+        self,
+        domains=None,
+        subdomains=None,
+        groupby="domain",
+        include_month=False,
+        date_start=None,
+        date_end=None,
+        export=None,
     ):
 
         """
@@ -173,5 +183,67 @@ class GoogleHistoryAnalyzer:
         else:
             df = df.sort_values("time_spent_s", ascending=False)
 
-        # return
-        return df
+        # return or export
+        if export is not None:
+            self.export_df(df, export)
+        else:
+            return df
+
+    def export_df(self, df, export_format):
+
+        """
+        Method to export analysis
+        """
+
+        # create random filename
+        filename = f"{str(uuid.uuid4())}.{export_format.lower()}"
+
+        # csv
+        if export_format == "csv":
+            df.to_csv(filename)
+
+        # tsv
+        elif export_format == "tsv":
+            df.to_csv(filename, sep="\t")
+
+        # excel
+        elif export_format == "xls":
+            df.to_excel(filename)
+
+        # console
+        elif export_format == "console":
+            df = df.reset_index()
+            print(df.to_markdown(index=False))
+
+        if export_format != "console":
+            logging.info(f"exported file: {filename}, with {len(df)} rows")
+
+
+def main(analysis, export, kwargs):
+
+    # init client
+    client = GoogleHistoryAnalyzer()
+
+    # process
+    client.process()
+
+    # parse kwargs
+    kwargs = json.loads(kwargs)
+
+    # run analysis
+    logging.info(f"running analysis method: {analysis}")
+    analysis_func = getattr(client, analysis)
+    analysis_func(export=export, **kwargs)
+
+
+if __name__ == "__main__":
+
+    # parse args
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--analysis", default="time_by_domain")
+    parser.add_argument("--export", default="csv")
+    parser.add_argument("--kwargs", default="{}")
+    args = parser.parse_args()
+
+    # run main
+    main(args.analysis, args.export, args.kwargs)
