@@ -28,7 +28,7 @@ ipython
 ```
 
 7. import class and process for fun stuff
-```
+```python
 from google_history import *
 
 # init, which parses history as dataframe
