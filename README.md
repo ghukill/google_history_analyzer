@@ -80,3 +80,14 @@ month year domain_full
 
 [237 rows x 4 columns]
 ```
+
+## Building Standalone Executable
+
+### Mac OS
+```bash
+pyinstaller google_history.py --noconfirm --clean --hidden-import cmath --hidden-import tabulate
+```
+
+## Running Standalone Executable
+
+*TODO*

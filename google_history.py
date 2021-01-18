@@ -3,14 +3,11 @@ Script to analyze browsing history from Google Takeout: https://takeout.google.c
 """
 
 import argparse
-import io
 import json
 import logging
-import os
 from urllib.parse import urlparse
 import uuid
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
