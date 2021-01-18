@@ -1,0 +1,6 @@
+black
+jedi==0.17.2 # fixes ipython bug: https://github.com/ipython/ipython/issues/12742#issuecomment-751447822
+matplotlib
+pandas==1.2.0
+
+
