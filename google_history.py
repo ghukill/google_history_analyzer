@@ -5,6 +5,7 @@ Script to analyze browsing history from Google Takeout: https://takeout.google.c
 import argparse
 import json
 import logging
+import time
 from urllib.parse import urlparse
 import uuid
 
@@ -30,9 +31,17 @@ class GoogleHistoryAnalyzer:
 
     history_list_filepath = "exports/history_list.json"
 
-    def __init__(self, single_page_time_spent_limit=600):
+    default_domain_clip_time_spent = 600
 
-        self.single_page_time_spent_limit = single_page_time_spent_limit
+    # TODO: include regex for urls, not just domain (e.g. foo.com/longplay/abc123 vs foo.com/settings)
+    custom_domain_clip_time_spent = {
+        "meet.google.com": 10800,
+        "youtube.com": 3600,
+        "netflix.com": 10800,
+        "hulu.com": 10800,
+    }
+
+    def __init__(self):
 
         # write parsed version of history
         logging.info(f"parsing input: {HISTORY_FILEPATH}")
@@ -77,7 +86,7 @@ class GoogleHistoryAnalyzer:
         self.df["time_spent_s"] = -(self.df.timestamp.diff() / np.timedelta64(1, "s"))
 
         # upperbound seconds at 600 (10 minutes) [default] on a single page
-        self.df.time_spent_s = self.df.time_spent_s.clip(upper=self.single_page_time_spent_limit)
+        self.clip_time_spent()
 
         # derive from seconds
         self.df["time_spent_m"] = self.df["time_spent_s"] / 60
@@ -85,7 +94,7 @@ class GoogleHistoryAnalyzer:
         self.df["time_spent_d"] = self.df["time_spent_h"] / 24
 
         # create seconds bins
-        second_bins = [0, 1, 5, 10, 30, 60, 240, 600, 1800, np.inf]
+        second_bins = [0, 1, 5, 10, 30, 60, 240, 600, 1800, 3600, np.inf]
         self.df["time_spent_bins"] = pd.cut(self.df.time_spent_s, second_bins)
 
     @classmethod
@@ -125,6 +134,23 @@ class GoogleHistoryAnalyzer:
 
         # return df
         return df
+
+    def clip_time_spent(self):
+
+        """
+        Method to set upper bound for time spent on page
+        """
+
+        # loop through and perform custom clips
+        for domain, upper_bound in self.custom_domain_clip_time_spent.items():
+            self.df.loc[self.df.domain == domain, "time_spent_s"] = self.df[self.df.domain == domain].time_spent_s.clip(
+                upper=upper_bound
+            )
+
+        # clip all non-custom domains to 10 minutes
+        self.df.loc[~self.df.domain.isin(list(self.custom_domain_clip_time_spent.keys())), "time_spent_s"] = self.df[
+            ~self.df.domain.isin(list(self.custom_domain_clip_time_spent.keys()))
+        ].time_spent_s.clip(upper=self.default_domain_clip_time_spent)
 
     def time_by_domain(
         self,

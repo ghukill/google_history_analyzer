@@ -83,9 +83,11 @@ month year domain_full
 
 ## Building Standalone Executable
 
+  * include `--onefile` to build single file executable
+
 ### Mac OS
 ```bash
-pyinstaller google_history.py --noconfirm --clean --hidden-import cmath --hidden-import tabulate
+pyinstaller google_history.py --onefile --noconfirm --clean --hidden-import cmath --hidden-import tabulate --exclude-module PIL --exclude-module IPython --exclude PyInstaller
 ```
 
 ## Running Standalone Executable
