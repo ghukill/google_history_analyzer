@@ -51,8 +51,8 @@ Somewhat experimental, this python script has been packaged as mac binary that c
 #### Installation
 
   - create new directory to work from
-  - download this repo [here]()
-  - unzip and move into directory `google_history_analyzer`  
+  - download source code from [here](https://github.com/ghukill/google_history_analyzer/releases/tag/0.1) (zip or tar)
+  - unzip file and move into the newly created directory `google_history_analyzer-0.1`  
   - copy/move your Google Takeout history JSON file into `inputs` directory  
   - test by analyzing random domain:
 
