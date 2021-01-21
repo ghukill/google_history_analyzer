@@ -52,30 +52,32 @@ Somewhat experimental, this python script has been packaged as mac binary that c
 
   - create new directory to work from
   - download source code from [here](https://github.com/ghukill/google_history_analyzer/releases/tag/0.1) (zip or tar)
-  - unzip file and move into the newly created directory `google_history_analyzer-0.1`  
+  - unzip file and move into the newly created directory `google_history_analyzer-0.1`
+  - make binary executable: `chmod +x ./dist/google_history`
+  - **only once:** from Mac finder window, right-click `google_history` and select "Open" to remove future warnings  
   - copy/move your Google Takeout history JSON file into `inputs` directory  
   - test by analyzing random domain:
 
 ```bash
-./google_history --analysis time_by_random_domain
+./dist/google_history --analysis time_by_random_domain
 ``` 
 
 #### example: search for time spent on two domains broken down by month, output to screen
 
 ```
-./google_history --domains github.com stackoverflow.com --include_month true
+./dist/google_history --domains github.com stackoverflow.com --include_month true
 ```
 
 #### example: single domain, broken down by subdomain, for date range, output to screen
 
 ```
-./google_history --domains google.com --groupby subdomain --date_start 06-01-2020 --date_end 07-01-2020
+./dist/google_history --domains google.com --groupby subdomain --date_start 06-01-2020 --date_end 07-01-2020
 ```
 
 #### example: ALL domains, exported to CSV file (potentially large)
 
 ```
-./google_history --export csv
+./dist/google_history --export csv
 ```
 
 ### python library
