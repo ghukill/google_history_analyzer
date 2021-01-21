@@ -51,7 +51,7 @@ Somewhat experimental, this python script has been packaged as mac binary that c
 #### Installation
 
   - create new directory to work from
-  - download source code from [here](https://github.com/ghukill/google_history_analyzer/releases/tag/0.1) (zip or tar)
+  - download source code from [here](https://github.com/ghukill/google_history_analyzer/archive/0.1.zip) (zip or tar)
   - unzip file and move into the newly created directory `google_history_analyzer-0.1`
   - make binary executable: `chmod +x ./dist/google_history`
   - **only once:** from Mac finder window, right-click `google_history` and select "Open" to remove future warnings  
