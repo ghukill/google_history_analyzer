@@ -49,11 +49,9 @@ gha.process()
 Somewhat experimental, this python script has been packaged as mac binary that can be executed standalone.
 
 #### Installation
-
-  - create new directory to work from
-  - download source code from [here](https://github.com/ghukill/google_history_analyzer/archive/0.1.zip) (zip or tar)
-  - unzip file and move into the newly created directory `google_history_analyzer-0.1`
-  - make binary executable: `chmod +x ./dist/google_history`
+  
+  - download source code zip file [here](https://github.com/ghukill/google_history_analyzer/archive/0.1.zip)
+  - unzip file and move into the newly created directory `google_history_analyzer-0.1`  
   - **only once:** from Mac finder window, right-click `google_history` and select "Open" to remove future warnings  
   - copy/move your Google Takeout history JSON file into `inputs` directory  
   - test by analyzing random domain:
