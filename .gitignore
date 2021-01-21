@@ -7,4 +7,4 @@ __pycache__/
 # pyinstaller
 google_history.spec
 build/
-dist/
+#dist/
