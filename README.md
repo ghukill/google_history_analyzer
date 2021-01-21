@@ -42,7 +42,42 @@ gha = GoogleHistoryAnalyzer()
 gha.process()
 ```
 
-## Fun Stuff
+## Usage
+
+### standalone executable binary
+
+Somewhat experimental, this python script has been packaged as mac binary that can be executed standalone.
+
+#### Installation
+
+  1. create a new, dedicated directory to work in
+  2. download [mac binary](https://github.com/ghukill/google_history_analyzer/releases/download/0.1/google_history) there
+  3. create `inputs` directory and move Google Takeout history JSON file into that directory
+  4. test by analyzing random domain:
+
+```bash
+./google_history --analysis time_by_random_domain
+``` 
+
+#### example: search for time spent on two domains broken down by month, output to screen
+
+```
+./google_history --domains github.com stackoverflow.com --include_month true
+```
+
+#### example: single domain, broken down by subdomain, for date range, output to screen
+
+```
+./google_history --domains google.com --groupby subdomain --date_start 06-01-2020 --date_end 07-01-2020
+```
+
+#### example: ALL domains, exported to CSV file (potentially large)
+
+```
+./google_history --export csv
+```
+
+### python library
 
 Analyze time spent on a domain by month:
 ```python

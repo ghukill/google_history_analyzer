@@ -5,6 +5,7 @@ Script to analyze browsing history from Google Takeout: https://takeout.google.c
 import argparse
 import json
 import logging
+import os
 import random
 from urllib.parse import urlparse
 import uuid
@@ -13,9 +14,6 @@ import numpy as np
 import pandas as pd
 
 logging.getLogger().setLevel(logging.INFO)
-
-# TODO: consider reading multiple files
-HISTORY_FILEPATH = "inputs/history.json"
 
 
 # setup some interactive pandas settings
@@ -41,11 +39,20 @@ class GoogleHistoryAnalyzer:
         "hulu.com": 10800,
     }
 
-    def __init__(self):
+    def __init__(self, input_filepath="inputs/history.json"):
+
+        self.input_filepath = input_filepath
+
+        # if ./exports directory does not exist, attempt to create
+        if not os.path.exists("./exports"):
+            try:
+                os.mkdir("exports")
+            except:
+                raise Exception("could not created directory: ./exports")
 
         # write parsed version of history
-        logging.info(f"parsing input: {HISTORY_FILEPATH}")
-        with open(HISTORY_FILEPATH, "r") as f:
+        logging.info(f"parsing input: {self.input_filepath}")
+        with open(self.input_filepath, "r") as f:
             history_list = json.load(f)["Browser History"]
             with open(self.history_list_filepath, "w") as f:
                 f.write(json.dumps(history_list))
@@ -212,10 +219,7 @@ class GoogleHistoryAnalyzer:
         else:
             return df
 
-    def time_by_random_domain(
-        self,
-        export=None,
-    ):
+    def time_by_random_domain(self, export=None, **kwargs):
 
         """
         Method to analyze by time spent on domains
@@ -240,7 +244,7 @@ class GoogleHistoryAnalyzer:
         """
 
         # create random filename
-        filename = f"{str(uuid.uuid4())}.{export_format.lower()}"
+        filename = f"exports/{str(uuid.uuid4())}.{export_format.lower()}"
 
         # csv
         if export_format == "csv":
@@ -263,21 +267,22 @@ class GoogleHistoryAnalyzer:
             logging.info(f"exported file: {filename}, with {len(df)} rows")
 
 
-def main(analysis, export, kwargs):
+def main(input_filepath, analysis, export, kwargs):
 
     # init client
-    client = GoogleHistoryAnalyzer()
+    try:
+        client = GoogleHistoryAnalyzer(input_filepath=input_filepath)
 
-    # process
-    client.process()
+        # process
+        client.process()
 
-    # parse kwargs
-    kwargs = json.loads(kwargs)
+        # run analysis
+        logging.info(f"running analysis method: {analysis}")
+        analysis_func = getattr(client, analysis)
+        analysis_func(export=export, **kwargs)
 
-    # run analysis
-    logging.info(f"running analysis method: {analysis}")
-    analysis_func = getattr(client, analysis)
-    analysis_func(export=export, **kwargs)
+    except Exception as e:
+        logging.error(str(e))
 
 
 if __name__ == "__main__":
@@ -285,9 +290,24 @@ if __name__ == "__main__":
     # parse args
     parser = argparse.ArgumentParser()
     parser.add_argument("--analysis", default="time_by_domain")
-    parser.add_argument("--export", default="csv")
+    parser.add_argument("--export", default="console")
     parser.add_argument("--kwargs", default="{}")
+    parser.add_argument("--input_filepath", default="inputs/history.json")
+
+    # mix-ins for kwargs
+    parser.add_argument("--domains", nargs="+", default=None)
+    parser.add_argument("--subdomains", nargs="+", default=None)
+    parser.add_argument("--groupby", default="domain")
+    parser.add_argument("--include_month", default=False)
+    parser.add_argument("--date_start", default=None)
+    parser.add_argument("--date_end", default=None)
+
     args = parser.parse_args()
 
+    # apply mixins
+    kwargs = json.loads(args.kwargs)
+    for arg in ["domains", "subdomains", "groupby", "include_month", "date_start", "date_end"]:
+        kwargs[arg] = getattr(args, arg)
+
     # run main
-    main(args.analysis, args.export, args.kwargs)
+    main(args.input_filepath, args.analysis, args.export, kwargs)
