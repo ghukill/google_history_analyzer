@@ -5,7 +5,7 @@
   * websites where "consuming" might be opening a tab and listening / watching content will have durations only until another browsing action is performed
     * e.g. 30 video watched on `youtube.com`, but navigated to `foo.com` 5 minutes in, duration for domain `youtube.com` will be only 5 minutes for that interaction
 
-## Instructions
+## Development
 
 1. Download browsing history from Google Takeout
 
@@ -48,12 +48,14 @@ gha.process()
 
 Somewhat experimental, this python script has been packaged as mac binary that can be executed standalone.
 
-#### Installation
+#### Installation  
   
   - download source code zip file [here](https://github.com/ghukill/google_history_analyzer/archive/0.1.zip)
   - unzip file and move into the newly created directory `google_history_analyzer-0.1`  
   - **only once:** from Mac finder window, right-click `google_history` and select "Open" to remove future warnings  
-  - copy/move your Google Takeout history JSON file into `inputs` directory  
+  - go to Google Takeout and download My Activity --> Chrome (can deselect all others in both windows)
+    - should unzip to a single JSON file of your browsing history
+  - copy/move that Google Takeout history JSON file into `inputs` directory  
   - test by analyzing random domain:
 
 ```bash
@@ -129,7 +131,3 @@ month year domain_full
 ```bash
 pyinstaller google_history.py --onefile --noconfirm --clean --hidden-import cmath --hidden-import tabulate --exclude-module PIL --exclude-module IPython --exclude PyInstaller
 ```
-
-## Running Standalone Executable
-
-*TODO*
